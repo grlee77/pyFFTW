@@ -730,6 +730,10 @@ class InterfacesNumpyFFTTestFFTN(InterfacesNumpyFFTTestFFT2):
             ((4, 6, 8, 4), {'axes': (0, 3, 1)}),
             ((4, 6, 4, 4), {'axes': (0, 3, 1), 'norm': 'ortho'}),
             ((4, 6, 8, 4), {'axes': (0, 3, 1, 2)}),
+            # len(axes) < ndim - 1 fails if the MKL FFTW symbols are used.
+            # see:  gh-40 and gh-106
+            ((64, 128, 16), {'axes': (-1, )}),
+            ((4, 6, 8, 4), {'axes': (0, 1)}),
             )
 
 class InterfacesNumpyFFTTestIFFTN(InterfacesNumpyFFTTestFFTN):
