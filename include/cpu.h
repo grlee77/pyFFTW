@@ -46,10 +46,16 @@
 
 #if defined(__amd64__) || defined (_M_X64) || defined(__i386__) || defined(_M_IX86) || defined(_X86_)
 
-  #define AVX_WORD 2
+  /* As defined in Table 1-2 of Intel's "Architecture Instruction Set
+  Extensions and Future Features Programming Reference" (October, 2017)
+  https://software.intel.com/en-us/intel-isa-extensions
+  */
+  #define AVX_WORD 2  /* 2 = ECX */
   #define AVX_BIT 28
-  #define SSE_WORD 3
+  #define SSE_WORD 3  /* 3 = EDX */
   #define SSE_BIT 25
+  #define AVX512F_WORD 1  /* 1 = EBX */
+  #define AVX512F_BIT 16
 
   #ifdef _MSC_VER
     /* Visual Studio Code */
@@ -78,6 +84,12 @@
 /* Returns the byte alignment for optimum simd operations */
 static inline int simd_alignment(void){
     int cpuinfo[4];
+
+    /* This gets the cpuinfo (set by 7)*/
+    cpuid(7, cpuinfo);
+
+    if (cpuinfo[AVX512F_WORD] & (1<<AVX512F_BIT))  /* AVX-512F */
+        return 64;
 
     /* This gets the cpuinfo (set by 1)*/
     cpuid(1, cpuinfo);
