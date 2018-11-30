@@ -144,7 +144,7 @@ cdef void* _fftw_plan_null(
             int rank, fftw_iodim *dims,
             int howmany_rank, fftw_iodim *howmany_dims,
             void *_in, void *_out,
-            int sign, unsigned flags):
+            int *direction, unsigned flags):
 
     raise RuntimeError("Undefined planner. This is a bug")
 
@@ -154,19 +154,19 @@ IF HAVE_DOUBLE:
                 int rank, fftw_iodim *dims,
                 int howmany_rank, fftw_iodim *howmany_dims,
                 void *_in, void *_out,
-                int sign, unsigned flags) nogil:
+                int *direction, unsigned flags) nogil:
 
         return <void *>fftw_plan_guru_dft(rank, dims,
                 howmany_rank, howmany_dims,
                 <cdouble *>_in, <cdouble *>_out,
-                sign, flags)
+                direction[0], flags)
 
     # real to complex double precision
     cdef void* _fftw_plan_guru_dft_r2c(
                 int rank, fftw_iodim *dims,
                 int howmany_rank, fftw_iodim *howmany_dims,
                 void *_in, void *_out,
-                int sign, unsigned flags) nogil:
+                int *direction, unsigned flags) nogil:
 
         return <void *>fftw_plan_guru_dft_r2c(rank, dims,
                 howmany_rank, howmany_dims,
@@ -178,7 +178,7 @@ IF HAVE_DOUBLE:
                 int rank, fftw_iodim *dims,
                 int howmany_rank, fftw_iodim *howmany_dims,
                 void *_in, void *_out,
-                int sign, unsigned flags) nogil:
+                int *direction, unsigned flags) nogil:
 
         return <void *>fftw_plan_guru_dft_c2r(rank, dims,
                 howmany_rank, howmany_dims,
@@ -203,19 +203,19 @@ IF HAVE_SINGLE:
                 int rank, fftw_iodim *dims,
                 int howmany_rank, fftw_iodim *howmany_dims,
                 void *_in, void *_out,
-                int sign, unsigned flags) nogil:
+                int *direction, unsigned flags) nogil:
 
         return <void *>fftwf_plan_guru_dft(rank, dims,
                 howmany_rank, howmany_dims,
                 <cfloat *>_in, <cfloat *>_out,
-                sign, flags)
+                direction[0], flags)
 
     # real to complex single precision
     cdef void* _fftwf_plan_guru_dft_r2c(
                 int rank, fftw_iodim *dims,
                 int howmany_rank, fftw_iodim *howmany_dims,
                 void *_in, void *_out,
-                int sign, unsigned flags) nogil:
+                int *direction, unsigned flags) nogil:
 
         return <void *>fftwf_plan_guru_dft_r2c(rank, dims,
                 howmany_rank, howmany_dims,
@@ -227,7 +227,7 @@ IF HAVE_SINGLE:
                 int rank, fftw_iodim *dims,
                 int howmany_rank, fftw_iodim *howmany_dims,
                 void *_in, void *_out,
-                int sign, unsigned flags) nogil:
+                int *direction, unsigned flags) nogil:
 
         return <void *>fftwf_plan_guru_dft_c2r(rank, dims,
                 howmany_rank, howmany_dims,
@@ -252,19 +252,19 @@ IF HAVE_LONG:
                 int rank, fftw_iodim *dims,
                 int howmany_rank, fftw_iodim *howmany_dims,
                 void *_in, void *_out,
-                int sign, unsigned flags) nogil:
+                int *direction, unsigned flags) nogil:
 
         return <void *>fftwl_plan_guru_dft(rank, dims,
                 howmany_rank, howmany_dims,
                 <clongdouble *>_in, <clongdouble *>_out,
-                sign, flags)
+                direction[0], flags)
 
     # real to complex long double precision
     cdef void* _fftwl_plan_guru_dft_r2c(
                 int rank, fftw_iodim *dims,
                 int howmany_rank, fftw_iodim *howmany_dims,
                 void *_in, void *_out,
-                int sign, unsigned flags) nogil:
+                int *direction, unsigned flags) nogil:
 
         return <void *>fftwl_plan_guru_dft_r2c(rank, dims,
                 howmany_rank, howmany_dims,
@@ -276,7 +276,7 @@ IF HAVE_LONG:
                 int rank, fftw_iodim *dims,
                 int howmany_rank, fftw_iodim *howmany_dims,
                 void *_in, void *_out,
-                int sign, unsigned flags) nogil:
+                int *direction, unsigned flags) nogil:
 
         return <void *>fftwl_plan_guru_dft_c2r(rank, dims,
                 howmany_rank, howmany_dims,
