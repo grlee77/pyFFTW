@@ -259,8 +259,9 @@ class InterfacesScipyFFTTest(unittest.TestCase):
             self.assertTrue(numpy.allclose(self.data, result))
 
 
-@unittest.skipIf(scipy_missing, 'scipy is not installed, so this feature is'
-                                'unavailable')
+@unittest.skipIf(scipy_missing or
+                 (LooseVersion(scipy.__version__) <= LooseVersion('1.0.0')),
+                 'scipy is not installed, so this feature is unavailable')
 class InterfacesScipyFFTNTest(InterfacesScipyFFTTest):
     ''' Class template for building the scipy real to real tests.
     '''
