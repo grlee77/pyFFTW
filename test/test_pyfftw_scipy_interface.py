@@ -37,6 +37,7 @@ from pyfftw.interfaces import scipy_fftpack
 from distutils.version import LooseVersion
 
 import pyfftw
+from pyfftw import _supported_types
 import numpy
 
 try:
@@ -315,6 +316,13 @@ built_classes = []
 # Construct the r2r test classes.
 for floating_type, floating_name in [[numpy.float32, 'Float32'],
                                      [numpy.float64, 'Float64']]:
+    if floating_type == numpy.float32 and '32' not in _supported_types:
+        # skip single precision tests if library is unavailable
+        continue
+    elif floating_type == numpy.float64 and '64' not in _supported_types:
+        # skip double precision tests if library is unavailable
+        continue
+
     real_transforms = ('dct', 'idct', 'dst', 'idst')
     try:
         # additional n-dimensional real transforms in scipy 1.0+
