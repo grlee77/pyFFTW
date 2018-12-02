@@ -112,8 +112,8 @@ if '64' in _supported_types:
     atol = 1e-08
 elif '32' in _supported_types:
     default_floating_type = numpy.float32
-    rtol = 1e-04
-    atol = 1e-06
+    rtol = 1e-03
+    atol = 1e-05
 elif 'ld' in _supported_types:
     default_floating_type = numpy.longdouble
     rtol = 1e-05
