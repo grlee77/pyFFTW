@@ -108,10 +108,16 @@ io_dtypes = {
 
 if '64' in _supported_types:
     default_floating_type = numpy.float64
+    rtol = 1e-05
+    atol = 1e-08
 elif '32' in _supported_types:
     default_floating_type = numpy.float32
+    rtol = 1e-04
+    atol = 1e-06
 elif 'ld' in _supported_types:
     default_floating_type = numpy.longdouble
+    rtol = 1e-05
+    atol = 1e-08
 
 @unittest.skipIf(scipy_missing, 'scipy is not installed, so this feature is'
                  'unavailable')
@@ -208,7 +214,7 @@ class InterfacesScipyFFTTest(unittest.TestCase):
     # even though it is not on the list. Hence mark test-dependent values as
     # constants (so this particular test ends up being run twice).
     func_name = 'dct'
-    floating_type = default_floating_type
+    float_type = default_floating_type
 
     def setUp(self):
         self.scipy_func = getattr(scipy.fftpack, self.func_name)
@@ -216,7 +222,7 @@ class InterfacesScipyFFTTest(unittest.TestCase):
         self.ndims = numpy.random.randint(1, high=3)
         self.axis = numpy.random.randint(0, high=self.ndims)
         self.shape = numpy.random.randint(2, high=10, size=self.ndims)
-        self.data = numpy.random.rand(*self.shape).astype(floating_type)
+        self.data = numpy.random.rand(*self.shape).astype(self.float_type)
         self.data_copy = self.data.copy()
 
         if self.func_name in ['dctn', 'idctn', 'dstn', 'idstn']:
@@ -234,7 +240,8 @@ class InterfacesScipyFFTTest(unittest.TestCase):
             self.assertEqual(numpy.linalg.norm(self.data - self.data_copy), 0.0)
             data_hat_s = self.scipy_func(self.data, type=transform_type,
                                          overwrite_x=False, **self.kwargs)
-            self.assertTrue(numpy.allclose(data_hat_p, data_hat_s))
+            self.assertTrue(numpy.allclose(data_hat_p, data_hat_s,
+                                           atol=atol, rtol=rtol))
 
     def test_normalized(self):
         '''Test normalized against scipy results. Note that scipy does
@@ -249,7 +256,8 @@ class InterfacesScipyFFTTest(unittest.TestCase):
                 data_hat_s = self.scipy_func(self.data, type=transform_type,
                                              norm='ortho',
                                              overwrite_x=False, **self.kwargs)
-                self.assertTrue(numpy.allclose(data_hat_p, data_hat_s))
+                self.assertTrue(numpy.allclose(data_hat_p, data_hat_s,
+                                               atol=atol, rtol=rtol))
             except NotImplementedError:
                 return None
 
@@ -264,7 +272,8 @@ class InterfacesScipyFFTTest(unittest.TestCase):
             result = self.pyfftw_func(forward, type=inverse_type,
                                       norm='ortho',
                                       overwrite_x=False, **self.kwargs)
-            self.assertTrue(numpy.allclose(self.data, result))
+            self.assertTrue(numpy.allclose(self.data, result,
+                                           atol=atol, rtol=rtol))
 
 @unittest.skipIf(scipy_missing or
                  (LooseVersion(scipy.__version__) <= LooseVersion('1.0.0')),
@@ -277,14 +286,14 @@ class InterfacesScipyFFTNTest(InterfacesScipyFFTTest):
     # even though it is not on the list. Hence mark test-dependent values as
     # constants (so this particular test ends up being run twice).
     func_name = 'dctn'
-    floating_type = default_floating_type
+    float_type = default_floating_type
 
     def setUp(self):
         self.scipy_func = getattr(scipy.fftpack, self.func_name)
         self.pyfftw_func = getattr(scipy_fftpack, self.func_name)
         self.ndims = numpy.random.randint(1, high=3)
         self.shape = numpy.random.randint(2, high=10, size=self.ndims)
-        self.data = numpy.random.rand(*self.shape).astype(floating_type)
+        self.data = numpy.random.rand(*self.shape).astype(self.float_type)
         self.data_copy = self.data.copy()
         # random subset of axes
         self.axes = tuple(range(0, numpy.random.randint(0, high=self.ndims)))
@@ -299,7 +308,8 @@ class InterfacesScipyFFTNTest(InterfacesScipyFFTTest):
             self.assertEqual(numpy.linalg.norm(self.data - self.data_copy), 0.0)
             data_hat_s = self.scipy_func(self.data, type=transform_type,
                                          overwrite_x=False, axes=None)
-            self.assertTrue(numpy.allclose(data_hat_p, data_hat_s))
+            self.assertTrue(numpy.allclose(data_hat_p, data_hat_s,
+                                           atol=atol, rtol=rtol))
 
     @unittest.skipIf(LooseVersion(scipy.__version__) <= LooseVersion('1.2.0'),
                      'scipy version not new enough')
@@ -315,7 +325,8 @@ class InterfacesScipyFFTNTest(InterfacesScipyFFTTest):
             self.assertEqual(numpy.linalg.norm(self.data - self.data_copy), 0.0)
             data_hat_s = self.scipy_func(self.data, type=transform_type,
                                          overwrite_x=False, axes=-1)
-            self.assertTrue(numpy.allclose(data_hat_p, data_hat_s))
+            self.assertTrue(numpy.allclose(data_hat_p, data_hat_s,
+                                           atol=atol, rtol=rtol))
 
 
 built_classes = []
