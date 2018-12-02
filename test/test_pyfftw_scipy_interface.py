@@ -106,6 +106,13 @@ io_dtypes = {
         'r2c': (real_dtypes, make_r2c_real_data),
         'c2r': (real_dtypes, make_c2r_real_data)}
 
+if '64' in _supported_types:
+    default_floating_type = numpy.float64
+elif '32' in _supported_types:
+    default_floating_type = numpy.float32
+elif 'ld' in _supported_types:
+    default_floating_type = numpy.longdouble
+
 @unittest.skipIf(scipy_missing, 'scipy is not installed, so this feature is'
                  'unavailable')
 class InterfacesScipyFFTPackTestSimple(unittest.TestCase):
@@ -201,7 +208,7 @@ class InterfacesScipyFFTTest(unittest.TestCase):
     # even though it is not on the list. Hence mark test-dependent values as
     # constants (so this particular test ends up being run twice).
     func_name = 'dct'
-    floating_type = numpy.float64
+    floating_type = default_floating_type
 
     def setUp(self):
         self.scipy_func = getattr(scipy.fftpack, self.func_name)
@@ -259,7 +266,6 @@ class InterfacesScipyFFTTest(unittest.TestCase):
                                       overwrite_x=False, **self.kwargs)
             self.assertTrue(numpy.allclose(self.data, result))
 
-
 @unittest.skipIf(scipy_missing or
                  (LooseVersion(scipy.__version__) <= LooseVersion('1.0.0')),
                  'scipy is not installed, so this feature is unavailable')
@@ -271,7 +277,7 @@ class InterfacesScipyFFTNTest(InterfacesScipyFFTTest):
     # even though it is not on the list. Hence mark test-dependent values as
     # constants (so this particular test ends up being run twice).
     func_name = 'dctn'
-    floating_type = numpy.float64
+    floating_type = default_floating_type
 
     def setUp(self):
         self.scipy_func = getattr(scipy.fftpack, self.func_name)
