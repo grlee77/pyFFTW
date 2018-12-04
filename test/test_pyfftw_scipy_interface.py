@@ -108,16 +108,12 @@ io_dtypes = {
 
 if '64' in _supported_types:
     default_floating_type = numpy.float64
-    rtol = 1e-05
-    atol = 1e-08
 elif '32' in _supported_types:
     default_floating_type = numpy.float32
-    rtol = 1e-03
-    atol = 1e-05
 elif 'ld' in _supported_types:
     default_floating_type = numpy.longdouble
-    rtol = 1e-05
-    atol = 1e-08
+atol_dict = dict(f=1e-5, d=1e-7, g=1e-7)
+rtol_dict = dict(f=1e-4, d=1e-5, g=1e-5)
 
 @unittest.skipIf(scipy_missing, 'scipy is not installed, so this feature is'
                  'unavailable')
@@ -215,6 +211,8 @@ class InterfacesScipyFFTTest(unittest.TestCase):
     # constants (so this particular test ends up being run twice).
     func_name = 'dct'
     float_type = default_floating_type
+    atol = atol_dict['f']
+    rtol = rtol_dict['f']
 
     def setUp(self):
         self.scipy_func = getattr(scipy.fftpack, self.func_name)
@@ -241,7 +239,7 @@ class InterfacesScipyFFTTest(unittest.TestCase):
             data_hat_s = self.scipy_func(self.data, type=transform_type,
                                          overwrite_x=False, **self.kwargs)
             self.assertTrue(numpy.allclose(data_hat_p, data_hat_s,
-                                           atol=atol, rtol=rtol))
+                                           atol=self.atol, rtol=self.rtol))
 
     def test_normalized(self):
         '''Test normalized against scipy results. Note that scipy does
@@ -257,7 +255,7 @@ class InterfacesScipyFFTTest(unittest.TestCase):
                                              norm='ortho',
                                              overwrite_x=False, **self.kwargs)
                 self.assertTrue(numpy.allclose(data_hat_p, data_hat_s,
-                                               atol=atol, rtol=rtol))
+                                               atol=self.atol, rtol=self.rtol))
             except NotImplementedError:
                 return None
 
@@ -273,7 +271,7 @@ class InterfacesScipyFFTTest(unittest.TestCase):
                                       norm='ortho',
                                       overwrite_x=False, **self.kwargs)
             self.assertTrue(numpy.allclose(self.data, result,
-                                           atol=atol, rtol=rtol))
+                                           atol=self.atol, rtol=self.rtol))
 
 @unittest.skipIf(scipy_missing or
                  (LooseVersion(scipy.__version__) <= LooseVersion('1.0.0')),
@@ -287,6 +285,8 @@ class InterfacesScipyFFTNTest(InterfacesScipyFFTTest):
     # constants (so this particular test ends up being run twice).
     func_name = 'dctn'
     float_type = default_floating_type
+    atol = atol_dict['f']
+    rtol = rtol_dict['f']
 
     def setUp(self):
         self.scipy_func = getattr(scipy.fftpack, self.func_name)
@@ -309,7 +309,7 @@ class InterfacesScipyFFTNTest(InterfacesScipyFFTTest):
             data_hat_s = self.scipy_func(self.data, type=transform_type,
                                          overwrite_x=False, axes=None)
             self.assertTrue(numpy.allclose(data_hat_p, data_hat_s,
-                                           atol=atol, rtol=rtol))
+                                           atol=self.atol, rtol=self.rtol))
 
     @unittest.skipIf(LooseVersion(scipy.__version__) <= LooseVersion('1.2.0'),
                      'scipy version not new enough')
@@ -326,7 +326,7 @@ class InterfacesScipyFFTNTest(InterfacesScipyFFTTest):
             data_hat_s = self.scipy_func(self.data, type=transform_type,
                                          overwrite_x=False, axes=-1)
             self.assertTrue(numpy.allclose(data_hat_p, data_hat_s,
-                                           atol=atol, rtol=rtol))
+                                           atol=self.atol, rtol=self.rtol))
 
 
 built_classes = []
@@ -349,14 +349,22 @@ for floating_type, floating_name in [[numpy.float32, 'Float32'],
     except ImportError:
         real_transforms_nd = ()
 
+    dt_char = numpy.dtype(floating_type).char
+    atol = atol_dict[dt_char]
+    rtol = rtol_dict[dt_char]
+
     # test-cases where only one axis is transformed
     for transform_name in real_transforms:
         class_name = ('InterfacesScipyFFTTest' + transform_name.upper() +
                       floating_name)
 
-        globals()[class_name] = type(class_name, (InterfacesScipyFFTTest,),
-                                     {'func_name': transform_name,
-                                      'float_type': floating_type})
+        globals()[class_name] = type(
+            class_name,
+            (InterfacesScipyFFTTest,),
+            {'func_name': transform_name,
+             'float_type': floating_type,
+             'atol': atol,
+             'rtol': rtol})
 
         built_classes.append(globals()[class_name])
 
@@ -365,9 +373,13 @@ for floating_type, floating_name in [[numpy.float32, 'Float32'],
         class_name = ('InterfacesScipyFFTNTest' + transform_name.upper() +
                       floating_name)
 
-        globals()[class_name] = type(class_name, (InterfacesScipyFFTNTest,),
-                                     {'func_name': transform_name,
-                                      'float_type': floating_type})
+        globals()[class_name] = type(
+            class_name,
+            (InterfacesScipyFFTNTest,),
+            {'func_name': transform_name,
+             'float_type': floating_type,
+             'atol': atol,
+             'rtol': rtol})
 
         built_classes.append(globals()[class_name])
 
