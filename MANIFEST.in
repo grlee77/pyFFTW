@@ -9,6 +9,7 @@ include pyfftw/utils.pxi
 include test/*.py
 include conf.py
 include index.rst
+include pyproject.toml
 recursive-include include *.h
 
 # All documentation
